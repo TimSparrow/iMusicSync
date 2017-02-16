@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 use MusicDB\Album;
 use MusicDB\Artist;
@@ -26,6 +27,8 @@ class ImportCommand extends \ConsoleKit\Command{
 	{
 		$query = 'SELECT * FROM album ORDER BY sort_album';
 		$this->albums = $this->pdo->query($query, \PDO::FETCH_CLASS, 'Album');
+		print_r($this->albums);
+		exit;
 	}
 
 	/**
