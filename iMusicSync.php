@@ -1,5 +1,6 @@
 <?php
-namespace IMusicSync;
+use MusicDB\Album;
+use MusicDB\Artist;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,22 +14,26 @@ class ImportCommand extends \ConsoleKit\Command{
 	const targetPath = '~/Music';
 	
 	private $useLinks = true;
+	private $useRecode = false;
+	private $recodeParams = "ffmpeg %s ";
 	private $pdo = null;
 	private $albums;
-	
+
+	/**
+	 * Retrieve all albums from database 
+	 */
 	private function getAlbumList()
 	{
 		$query = 'SELECT * FROM album ORDER BY sort_album';
-		$this->albums = $this->pdo->query($query, \PDO::FETCH_CLASS, '\Mu');
+		$this->albums = $this->pdo->query($query, \PDO::FETCH_CLASS, 'Album');
 	}
 
-	private function getArtistForAlbum(\stdClass $album)
-	{
-		$query = "SELECT * FROM album_artist WHERE album_artist_pid=?";
-		$stm = $this->pdo->prepare($query);
-		$result = $stm->execute(Array($album->album_artist_id));
-		return $result->fetchAll();
-	}
+	/**
+	 * Get artist for an album
+	 * @param Album $album - album object from db
+	 * @return Artist - object representation of an artist
+	 */
+
 
 	private static function getPdoFileName()
 	{
@@ -66,7 +71,7 @@ class ImportCommand extends \ConsoleKit\Command{
 		$trackFile = $this->getTrackFile($track);
 		if($this->useLinks)
 		{
-			$command = "ln $trackFile, ";
+			$command = "ln $trackFile, $targetFile";
 			exec();
 		}
 		else
@@ -80,7 +85,7 @@ class ImportCommand extends \ConsoleKit\Command{
 		$this->getAlbumList();
 		foreach($this->albums as $album)
 		{
-			$artist = $this->getArtistForAlbum($album);
+			$artist = $album->getArtist();
 			$trackData = $this->getTrackData($album);
 			$path = $this->createPathForTracks(Array($artist->album_artist, $album->album_year . '_' . $album->album));
 			foreach($trackData as $track)
