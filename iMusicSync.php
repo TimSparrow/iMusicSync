@@ -91,7 +91,7 @@ class ImportCommand extends \ConsoleKit\Command{
 			continue;
 			$artist = $album->getArtist();
 			$trackData = $album->getTracks();
-			$path = $this->createPathForTracks(Array($artist->album_artist, $album->album_year . '_' . $album->album));
+			$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
 			foreach($trackData as $track)
 			{
 				$this->saveTrack($track, $path);
