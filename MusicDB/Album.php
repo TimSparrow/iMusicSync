@@ -8,9 +8,9 @@ namespace MusicDB;
 
 class Album extends AbstractEntity{
 	private $pdo;
-	public function __construct($pdo)
+	public function __construct()
 	{
-		$this->pdo = $pdo;
+		$this->pdo = \ImportCommand::getPdo();
 	}
 
 	public function getPathName()
@@ -33,8 +33,9 @@ class Album extends AbstractEntity{
 		}
 	}
 
-	public static function getList($pdo)
+	public static function getList()
 	{
+		$pdo = \ImportCommand::getPdo();
 		$query = 'SELECT * FROM album ORDER BY sort_album';
 		$albums = $pdo->query($query, \PDO::FETCH_CLASS, get_class());
 		return $albums;

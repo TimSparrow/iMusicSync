@@ -23,7 +23,7 @@ class ImportCommand extends \ConsoleKit\Command{
 	private $useLinks = true;
 	private $useRecode = false;
 	private $recodeParams = "ffmpeg %s ";
-	private $pdo = null;
+	private static $pdo = null;
 	private $albums;
 
 
@@ -50,15 +50,20 @@ class ImportCommand extends \ConsoleKit\Command{
 		return $exportPath;
 	}
 
+	public static function getPdo()
+	{
+		return self::$pdo;
+	}
+
 	private function init()
 	{
-		if($this->pdo == null)
+		if(self::$pdo == null)
 		{
 			$home = getenv('HOME');
 			$file = str_replace('~', $home, ($this->getPdoFileName()));
 			$schema = 'sqlite:'.$file;
 			echo "Using $file as database\n";
-			$this->pdo = new \PDO($schema);
+			self::$pdo = new \PDO($schema);
 		}
 	}
 
@@ -79,10 +84,10 @@ class ImportCommand extends \ConsoleKit\Command{
 	public function execute(array $args, array $options = array())
 	{
 		$this->init();
-		$this->albums = Album::getList($this->pdo);
+		$this->albums = Album::getList();
 		foreach($this->albums as $album)
 		{
-			print_r($album);
+			echo $album->getPathName(). "\n";
 			continue;
 			$artist = $album->getArtist();
 			$trackData = $this->getTrackData($album);
