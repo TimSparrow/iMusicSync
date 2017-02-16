@@ -7,6 +7,12 @@ namespace MusicDB;
  */
 
 class Album extends AbstractEntity{
+	private $pdo;
+	public function __construct($pdo)
+	{
+		$this->pdo = $pdo;
+	}
+
 	public function getPathName()
 	{
 		return $this->album_year . '_' . $this->normalize($this->album);
@@ -25,5 +31,12 @@ class Album extends AbstractEntity{
 		{
 			return $stm->fetch();
 		}
+	}
+
+	public static function getList($pdo)
+	{
+		$query = 'SELECT * FROM album ORDER BY sort_album';
+		$albums = $pdo->query($query, \PDO::FETCH_CLASS, get_class());
+		return $albums;
 	}
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+require_once 'vendor/autoload.php';
 use MusicDB\Album;
 use MusicDB\Artist;
 /* 
@@ -7,6 +8,11 @@ use MusicDB\Artist;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+spl_autoload_register(function($name){
+	$name = str_replace('\\', '/', $name);
+	require_once './'.$name.'.php';
+});
 
 class ImportCommand extends \ConsoleKit\Command{
 	const iPhoneDir = '~/backups/iphone/'; // change to the dir iPhone is mounted to on production version
@@ -20,22 +26,6 @@ class ImportCommand extends \ConsoleKit\Command{
 	private $pdo = null;
 	private $albums;
 
-	/**
-	 * Retrieve all albums from database 
-	 */
-	private function getAlbumList()
-	{
-		$query = 'SELECT * FROM album ORDER BY sort_album';
-		$this->albums = $this->pdo->query($query, \PDO::FETCH_CLASS, 'Album');
-		print_r($this->albums);
-		exit;
-	}
-
-	/**
-	 * Get artist for an album
-	 * @param Album $album - album object from db
-	 * @return Artist - object representation of an artist
-	 */
 
 
 	private static function getPdoFileName()
@@ -60,13 +50,16 @@ class ImportCommand extends \ConsoleKit\Command{
 		return $exportPath;
 	}
 
-	private function getPdo()
+	private function init()
 	{
 		if($this->pdo == null)
 		{
-			$this->pdo = new \PDO('sqlite:'.$this->getPdoFileName());
+			$home = getenv('HOME');
+			$file = str_replace('~', $home, ($this->getPdoFileName()));
+			$schema = 'sqlite:'.$file;
+			echo "Using $file as database\n";
+			$this->pdo = new \PDO($schema);
 		}
-		return $this->pdo;
 	}
 
 	private function saveTrack($track, $path)
@@ -85,9 +78,12 @@ class ImportCommand extends \ConsoleKit\Command{
 
 	public function execute(array $args, array $options = array())
 	{
-		$this->getAlbumList();
+		$this->init();
+		$this->albums = Album::getList($this->pdo);
 		foreach($this->albums as $album)
 		{
+			print_r($album);
+			continue;
 			$artist = $album->getArtist();
 			$trackData = $this->getTrackData($album);
 			$path = $this->createPathForTracks(Array($artist->album_artist, $album->album_year . '_' . $album->album));
