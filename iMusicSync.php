@@ -90,7 +90,7 @@ class ImportCommand extends \ConsoleKit\Command{
 			echo $album->getPathName(). "\n";
 			continue;
 			$artist = $album->getArtist();
-			$trackData = $this->getTrackData($album);
+			$trackData = $album->getTracks();
 			$path = $this->createPathForTracks(Array($artist->album_artist, $album->album_year . '_' . $album->album));
 			foreach($trackData as $track)
 			{

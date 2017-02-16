@@ -16,10 +16,11 @@ namespace MusicDB;
 abstract class AbstractEntity
 {
 	private $attributes;
-
+	protected $pdo;
 	public function __construct()
 	{
 		$this->attributes = Array();
+		$this->pdo = \ImportCommand::getPdo();
 	}
 
 	public function __get($name)
@@ -34,8 +35,13 @@ abstract class AbstractEntity
 
 	public abstract function getPathName();
 
+	/**
+	 * Replace all special characters with '-'
+	 * @param String $name
+	 * @return String
+	 */
 	public static function normalize($name)
 	{
-		return preg_replace('/\s+|\.|\,/', '-', $name);
+		return preg_replace('/(\s|\.|,|\:|\\|\/|\(|\)|\'|\`)+/', '-', $name);
 	}
 }
