@@ -9,6 +9,7 @@ use MusicDB\Artist;
  * and open the template in the editor.
  */
 
+// autoload classes
 spl_autoload_register(function($name){
 	$name = str_replace('\\', '/', $name);
 	require_once './'.$name.'.php';
@@ -79,15 +80,21 @@ class ImportCommand extends \ConsoleKit\Command{
 		}
 	}
 
+	/**
+	 * Required method by \ConsoleKit\Command
+	 * @param array $args
+	 * @param array $options
+	 */
 	public function execute(array $args, array $options = array())
 	{
 		$this->init();
 		$this->albums = Album::getList();
+		echo sprintf("Got %d albums:\n", $this->albums->count);
 		foreach($this->albums as $album)
 		{
-			echo $album->getPathName(). "\n";
-			continue;
 			$artist = $album->getArtist();
+			echo $artist . ' '. $album. "\n";
+			continue;
 			$trackData = $album->getTracks();
 			$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
 			foreach($trackData as $track)

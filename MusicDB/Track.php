@@ -22,12 +22,22 @@ class Track extends AbstractEntity
 		return sprintf(self::pattern,  $this->disc_number, $this->track_number, $this->title);
 	}
 
+	public function getId()
+	{
+		return $this->pid;
+	}
+
+	public function __toString()
+	{
+		return $this->title;
+	}
+
 	public function getFile()
 	{
 		return $this->path . '/'.$this->filename;
 	}
 
-	public static function getTracks($album_pid)
+	public static function getList($album_pid)
 	{
 		$query = "SELECT "
 			. "	item.item_pid AS pid, "

@@ -51,6 +51,16 @@ abstract class AbstractEntity
 	public abstract function getPathName();
 
 	/**
+	 * returns suitable string representation for listing/logging/debug
+	 */
+	public abstract function __toString();
+
+	/**
+	 * returns unique identifier for this entity used in db
+	 */
+	public abstract function getId();
+
+	/**
 	 * Replace all special characters with '-'
 	 * Used within getPathName()
 	 * @param String $name

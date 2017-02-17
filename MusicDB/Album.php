@@ -28,6 +28,20 @@ class Album extends AbstractEntity{
 	}
 
 	/**
+	 * Returns db identifier
+	 * @return \String
+	 */
+	public function getId()
+	{
+		return $this->album_pid;
+	}
+
+	public function __toString()
+	{
+		return $this->album;
+	}
+
+	/**
 	 * Get all albums in the database
 	 * @return \Traversable
 	 */
@@ -41,6 +55,8 @@ class Album extends AbstractEntity{
 
 	public function getTracks()
 	{
-		return Track::getList();
+		return Track::getList($this->getId());
 	}
+
+	
 }

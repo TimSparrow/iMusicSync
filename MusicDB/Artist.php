@@ -20,6 +20,15 @@ class Artist extends AbstractEntity
 		return $this->normalize($this->album_artist);
 	}
 
+	public function getId()
+	{
+		return $this->album_artist_pid;
+	}
+
+	public function __toString()
+	{
+		return $this->album_artist;
+	}
 
 	/**
 	 * Gets artist object for a given album
