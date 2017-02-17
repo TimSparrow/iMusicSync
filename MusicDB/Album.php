@@ -19,11 +19,6 @@ class Album extends AbstractEntity{
 	}
 
 	/**
-	 * Gets artist object for a given album
-	 * @return Artist
-	 */
-
-	/**
 	 * Returns db identifier
 	 * @return \String
 	 */
@@ -39,7 +34,7 @@ class Album extends AbstractEntity{
 
 	/**
 	 * Get all albums in the database
-	 * @return \Traversable
+	 * @return \PDOStatement
 	 */
 	public static function getList()
 	{
@@ -53,7 +48,10 @@ class Album extends AbstractEntity{
 	{
 		return Track::getList($this->getId());
 	}
-
+	/**
+	 * Gets artist object for a given album
+	 * @return Artist
+	 */
 	public function getArtist()
 	{
 		return Artist::getById($this->album_artist_pid);

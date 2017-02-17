@@ -43,6 +43,10 @@ abstract class AbstractEntity
 		$this->attributes[$name] = $value;
 	}
 
+	public function getAttributes()
+	{
+		return $this->attributes;
+	}
 	/**
 	 * Returns a string representation of the entity suitable for file name component
 	 * Should be reasonably sortable (i.e. albums start with year, tracks with number

@@ -92,6 +92,8 @@ class ImportCommand extends \ConsoleKit\Command{
 		echo sprintf("Got %d albums\n", sizeof($this->albums));
 		foreach($this->albums as $album)
 		{
+			print_r($album->getAttributes());
+			exit;
 			$artist = $album->getArtist();
 			echo $artist . ' '. $album. "\n";
 			continue;
