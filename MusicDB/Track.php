@@ -15,11 +15,11 @@ namespace MusicDB;
  */
 class Track extends AbstractEntity
 {
-	const pattern = "%d_%02d_%s";
+	const pattern = "%d_%02d_%s.%s";
 	
 	public function getPathName()
 	{
-		return sprintf(self::pattern,  $this->disc_number, $this->track_number, $this->title);
+		return sprintf(self::pattern,  $this->disc_number, $this->track_number, $this->normalize($this->title), $this->getFileExtension());
 	}
 
 	public function getId()
@@ -32,9 +32,15 @@ class Track extends AbstractEntity
 		return $this->title;
 	}
 
-	public function getFile()
+	public function getMediaFile()
 	{
 		return $this->path . '/'.$this->filename;
+	}
+
+	public function getFileExtension()
+	{
+		$dpos = strrpos($this->filename, '.');
+		return substr($this->filename, $dpos + 1);
 	}
 
 	public static function getList($album_pid)

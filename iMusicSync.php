@@ -19,11 +19,14 @@ class ImportCommand extends \ConsoleKit\Command{
 	const iPhoneDir = '~/backups/iphone/'; // change to the dir iPhone is mounted to on production version
 	const iTunesDB = 'iTunesControl';
 	const dbFile = 'iTunes/MediaLibrary.sqlitedb';
+	const sourcePath = '/Music';
 	const targetPath = '~/Music';
 	
 	private $useLinks = true;	// use hard links (debug only)
 	private $useRecode = false;	// recode files to mp3 (not implemented)
-	private $recodeParams = "ffmpeg %1s %2s";	// recode command
+	private $cmdRecode = "ffmpeg %1s %2s";	// recode command
+	private $cmdCopy = "cp %1s %2s";		// copy command
+	private $cmdLink = "ln %1s %2s";		// link command
 	private static $pdo = null;	// database handler
 	private $albums;
 	private static $home;		// user home
@@ -67,7 +70,25 @@ class ImportCommand extends \ConsoleKit\Command{
 			echo "Using $file as database\n";
 			self::$pdo = new \PDO($schema);
 			self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+			if($this->useRecode)
+			{
+				$this->cmd = $this->cmdRecode;
+			}
+			elseif($this->useLinks)
+			{
+				$this->cmd = $this->cmdLink;
+			}
+			else
+			{
+				$this->cmd = $this->cmdCopy;
+			}
 		}
+	}
+
+	private function getSourcePath()
+	{
+		return $this->getFullPath(self::iPhoneDir).self::iTunesDB . self::sourcePath;
 	}
 
 	private static function getFullPath($path)
@@ -81,16 +102,23 @@ class ImportCommand extends \ConsoleKit\Command{
 
 	private function saveTrack($track, $path)
 	{
-		$trackFile = $this->getTrackFile($track);
-		if($this->useLinks)
-		{
-			$command = "ln $trackFile, $targetFile";
-			exec();
-		}
-		else
-		{
+		$trackFile = $this->getSourcePath().$track->getMediaFile();
+		$targetFile = $path.'/'.$track->getPathName();
 
+		if(is_file($targetFile))
+		{
+			if(filemtime($targetFile) >= filemtime($trackFile))
+			{
+				$this->writeln('target exists');
+				return true;
+			}
+			else {
+				$this->write('target is old, overwriting');
+			}
 		}
+		$command = sprint($this->cmd, $trackFile, $targetFile);
+		//system($command, $res);
+		$this->writeln("\t\tcmd=".$command);
 	}
 
 	/**
@@ -107,29 +135,24 @@ class ImportCommand extends \ConsoleKit\Command{
 			echo sprintf("Got %d albums\n", sizeof($this->albums));
 			foreach($this->albums as $album)
 			{
-
 				$artist = $album->getArtist();
-				echo $artist . ' // '. $album;
-
-				$trackData = $album->getTracks();
-
+				$this->write($artist . ' // '. $album);
+				$tracks = $album->getTracks();
 				$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
-				echo "path: $path\n";
-				foreach($trackData as $track)
+				$this->writeln(sprintf(" contains %d tracks, saving to \tpath: %s", sizeof($tracks), $path));
+				foreach($tracks as $track)
 				{
-					echo "\t".$track." --> ".$track->getPathName()."\n";
-					continue;
+					$this->writeln("\t".$track);
 					$this->saveTrack($track, $path);
 				}
 				exit;
-
 			}
 		}
 		catch (\PDOException $x)
 		{
-			echo "Database exception: ".$x->getMessage()."\n";
-			print_r($x->errorInfo);
-			echo $x->getTraceAsString();
+			$this->writerr("Database exception: ".$x->getMessage());
+			$this->writerr(print_r($x->errorInfo, true));
+			$this->writeerr($x->getTraceAsString());
 			exit;
 		}
 	}

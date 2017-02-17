@@ -79,7 +79,7 @@ abstract class AbstractEntity
 	public static function normalize($name)
 	{
 		// replace potentially unsafe chars with '-'
-		$s =  preg_replace('/(\s|\.|,|\:|\\|\/|\(|\)|\'|\`)+/', '-', $name);
+		$s =  preg_replace('/(\s|\t|\.|,|\:|\\|\/|\(|\)|\'|\`)+/', '-', $name);
 		// replace multiple '-' with single ones
 		$s = preg_replace('/\-+/', '-', $s);
 		$s = trim($s, '-');
