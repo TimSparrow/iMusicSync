@@ -16,6 +16,9 @@ namespace MusicDB;
 class Track extends AbstractEntity
 {
 	const pattern = "%d_%02d_%s.%s";
+
+	private $album=null;
+	private $artist=null;
 	
 	public function getPathName()
 	{
@@ -75,5 +78,17 @@ class Track extends AbstractEntity
 		$stm->setFetchMode(\PDO::FETCH_CLASS, get_class());
 		$stm->execute(Array($album_pid));
 		return $stm->fetchAll();
+	}
+
+	public function updateTags($file)
+	{
+		if(null==$this->album)
+		{
+			throw new Exception('Album not set');
+		}
+		if(null==$this->artist)
+		{
+			throw new Exception('Artist not set');
+		}
 	}
 }

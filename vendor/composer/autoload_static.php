@@ -7,6 +7,13 @@ namespace Composer\Autoload;
 class ComposerStaticInit30fbf4532e3b31c9aec79db809d480c8
 {
     public static $prefixesPsr0 = array (
+        'Z' => 
+        array (
+            'Zend_' => 
+            array (
+                0 => __DIR__ . '/..' . '/debach/zend-mp3/lib',
+            ),
+        ),
         'C' => 
         array (
             'ConsoleKit' => 

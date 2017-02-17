@@ -23,8 +23,8 @@ class ImportCommand extends \ConsoleKit\Command{
 	const targetPath = '~/Music';
 	
 	private $useLinks = true;	// use hard links (debug only)
-	private $useRecode = false;	// recode files to mp3 (not implemented)
-	private $cmdRecode = "ffmpeg %1s %2s";	// recode command
+	private $useRecode = true;	// recode files to mp3 
+	private $cmdRecode = "ffmpeg -y -loglevel error -hide_banner -i %1s %2s";	// recode command
 	private $cmdCopy = "cp %1s %2s";		// copy command
 	private $cmdLink = "ln %1s %2s";		// link command
 	private static $pdo = null;	// database handler
@@ -124,9 +124,17 @@ class ImportCommand extends \ConsoleKit\Command{
 				$this->write('target is old, overwriting');
 			}
 		}
+		// write after this point
+
+
 		$this->write(" copying...");
 		$command = sprintf($this->cmd, $trackFile, $targetFile);
 		system($command, $res);
+		if($this->useRecode)
+		{
+			$track->updateTags($targetFile);
+		}
+
 		$this->writeln("done");
 	}
 

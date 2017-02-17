@@ -1,5 +1,6 @@
 {
     "require": {
-        "maximebf/consolekit": "dev-master"
+        "maximebf/consolekit": "dev-master",
+        "debach/zend-mp3": "^1.8"
     }
 }

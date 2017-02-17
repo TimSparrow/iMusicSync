@@ -4,9 +4,42 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "941cbe88f3655fbe9caa57622f58d5b4",
-    "content-hash": "9470fbc9260638fa538cac3dba4ab35d",
+    "hash": "6f9b9e32374273a9868450970262788e",
+    "content-hash": "323b1c258d7fb58e4b84ed45b3cba81a",
     "packages": [
+        {
+            "name": "debach/zend-mp3",
+            "version": "1.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/debach/zend-mp3.git",
+                "reference": "17b523ad57f283ddf3a116bc0eff22cb9d1b4b27"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/debach/zend-mp3/zipball/17b523ad57f283ddf3a116bc0eff22cb9d1b4b27",
+                "reference": "17b523ad57f283ddf3a116bc0eff22cb9d1b4b27",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Zend_": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Sven Vollbehr"
+                }
+            ],
+            "description": "The best PHP library for Object-Oriented media file information reading and writing.",
+            "homepage": "https://code.google.com/p/php-reader/",
+            "time": "2016-01-04 13:23:44"
+        },
         {
             "name": "maximebf/consolekit",
             "version": "dev-master",

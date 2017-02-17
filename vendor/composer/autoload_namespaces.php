@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Zend_' => array($vendorDir . '/debach/zend-mp3/lib'),
     'ConsoleKit' => array($vendorDir . '/maximebf/consolekit/src'),
 );
