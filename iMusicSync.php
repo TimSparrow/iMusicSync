@@ -21,17 +21,18 @@ class ImportCommand extends \ConsoleKit\Command{
 	const dbFile = 'iTunes/MediaLibrary.sqlitedb';
 	const targetPath = '~/Music';
 	
-	private $useLinks = true;
-	private $useRecode = false;
-	private $recodeParams = "ffmpeg %s ";
-	private static $pdo = null;
+	private $useLinks = true;	// use hard links (debug only)
+	private $useRecode = false;	// recode files to mp3 (not implemented)
+	private $recodeParams = "ffmpeg %1s %2s";	// recode command
+	private static $pdo = null;	// database handler
 	private $albums;
-
+	private static $home;		// user home
+	private static $mode=0755;	// directory create mode
 
 
 	private static function getPdoFileName()
 	{
-		return self::iPhoneDir. self::iTunesDB . '/' . self::dbFile;
+		return self::getFullPath(self::iPhoneDir). self::iTunesDB . '/' . self::dbFile;
 	}
 
 	/**
@@ -41,10 +42,13 @@ class ImportCommand extends \ConsoleKit\Command{
 	 */
 	private function createPathForTracks(Array $pathComponents)
 	{
-		$exportPath = self::targetPath . '/' . implode('/', $pathComponents);
+		$exportPath = self::getFullPath(self::targetPath) . '/' . implode('/', $pathComponents);
 		if(!is_dir($exportPath))
 		{
-			mkdir($exportPath);
+			if(!mkdir($exportPath, self::$mode, true))
+			{
+				throw new Exception("Failed to create directory $exportPath");
+			}
 		}
 		return $exportPath;
 	}
@@ -58,12 +62,21 @@ class ImportCommand extends \ConsoleKit\Command{
 	{
 		if(self::$pdo == null)
 		{
-			$home = getenv('HOME');
-			$file = str_replace('~', $home, ($this->getPdoFileName()));
+			$file = $this->getPdoFileName();
 			$schema = 'sqlite:'.$file;
 			echo "Using $file as database\n";
 			self::$pdo = new \PDO($schema);
+			self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
+	}
+
+	private static function getFullPath($path)
+	{
+		if(null===self::$home)
+		{
+			self::$home = getenv('HOME');
+		}
+		return str_replace('~', self::$home, $path);;
 	}
 
 	private function saveTrack($track, $path)
@@ -88,21 +101,36 @@ class ImportCommand extends \ConsoleKit\Command{
 	public function execute(array $args, array $options = array())
 	{
 		$this->init();
-		$this->albums = Album::getList();
-		echo sprintf("Got %d albums\n", sizeof($this->albums));
-		foreach($this->albums as $album)
+		try
 		{
-
-			$artist = $album->getArtist();
-			echo $artist . ' '. $album. "\n";
-			exit;
-			$trackData = $album->getTracks();
-			$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
-			foreach($trackData as $track)
+			$this->albums = Album::getList();
+			echo sprintf("Got %d albums\n", sizeof($this->albums));
+			foreach($this->albums as $album)
 			{
-				$this->saveTrack($track, $path);
-			}
 
+				$artist = $album->getArtist();
+				echo $artist . ' // '. $album;
+
+				$trackData = $album->getTracks();
+
+				$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
+				echo "path: $path\n";
+				foreach($trackData as $track)
+				{
+					echo "\t".$track." --> ".$track->getPathName()."\n";
+					continue;
+					$this->saveTrack($track, $path);
+				}
+				exit;
+
+			}
+		}
+		catch (\PDOException $x)
+		{
+			echo "Database exception: ".$x->getMessage()."\n";
+			print_r($x->errorInfo);
+			echo $x->getTraceAsString();
+			exit;
 		}
 	}
 }
