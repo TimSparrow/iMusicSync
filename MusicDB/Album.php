@@ -8,10 +8,14 @@ namespace MusicDB;
 
 class Album extends AbstractEntity{
 
-
+	const pattern = "%04d_%s";
+	/**
+	 * Returns
+	 * @return String
+	 */
 	public function getPathName()
 	{
-		return $this->album_year . '_' . $this->normalize($this->album);
+		return sprintf(self::pattern, $this->album_year, $this->normalize($this->album));
 	}
 
 	/**
@@ -20,15 +24,13 @@ class Album extends AbstractEntity{
 	 */
 	public function getArtist()
 	{
-		$query = "SELECT * FROM album_artist WHERE album_artist_pid=?";
-		$stm = $this->pdo->prepare($query);
-		$stm->setFetchMode(PDO::FETCH_CLASS, 'Artist');
-		if ($stm->execute(Array($this->album_artist_id)))
-		{
-			return $stm->fetch();
-		}
+		return Artist::getArtist($this->album_artist_pid);
 	}
 
+	/**
+	 * Get all albums in the database
+	 * @return \Traversable
+	 */
 	public static function getList()
 	{
 		$pdo = \ImportCommand::getPdo();
@@ -39,31 +41,6 @@ class Album extends AbstractEntity{
 
 	public function getTracks()
 	{
-		$query = "SELECT "
-				. "	item.item_pid AS pid, "
-				. "	item.media_type AS media_type,"
-				. "	item.item_artist_pid AS item_artist_pid,"
-				. "	item.album_pid AS album_pid,"
-				. "	item.disc_number AS disc_number,"
-				. "	item.track_number AS track_number,"
-				. "	item.genre_id AS genre_id,"
-				. "	genre.genre AS genre,"
-				. "	item_extra.title AS title,"
-				. "	item_extra.location AS filename,"
-				. "	base_location.path AS path,"
-				. "	item_playback.bit_rate AS bitrate"
-				. "FROM item JOIN item_extra ON item.item_pid = item_extra.item_pid"
-				. "	JOIN genre ON item.genre_id=genre.genre_id"
-				. "	JOIN item_playback ON item.item_pid= item_playback.item_pid"
-				. "	JOIN base_location ON base_location.base_location_id=item.base_location_id"
-				. "WHERE album_pid = ? "
-				. "	AND item_playback.audio_format > 0 "	// skip non-audio files
-				. "	AND item.keep_local > 0"				// skip podcasts
-				. "ORDER by disc_number,track_number";
-
-		$stm = $this->pdo->prepare($query);
-		$stm->setFetchMode(\PDO::FETCH_CLASS, 'Track');
-		$stm->execute(Array($this->album_pid));
-		return $stm->fetchAll();
+		return Track::getList();
 	}
 }

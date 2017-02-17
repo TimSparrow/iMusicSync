@@ -40,9 +40,7 @@ class ImportCommand extends \ConsoleKit\Command{
 	 */
 	private function createPathForTracks(Array $pathComponents)
 	{
-		$exportPath = self::targetPath . '/'. implode('/', array_map(function($path){
-			return preg_replace('/\s+/', '-', $path);
-		}, $pathComponents));
+		$exportPath = self::targetPath . '/' . implode('/', $pathComponents);
 		if(!is_dir($exportPath))
 		{
 			mkdir($exportPath);
