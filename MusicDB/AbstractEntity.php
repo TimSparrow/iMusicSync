@@ -16,11 +16,17 @@ namespace MusicDB;
 abstract class AbstractEntity
 {
 	private $attributes;
-	protected $pdo;
+	protected static $pdo =  null;
 	public function __construct()
 	{
-		$this->attributes = Array();
-		$this->pdo = \ImportCommand::getPdo();
+		if(!is_array($this->attributes))
+		{
+			$this->attributes = Array();
+		}
+		if(null===self::$pdo)
+		{
+			self::$pdo = \ImportCommand::getPdo();
+		}
 	}
 
 	/**

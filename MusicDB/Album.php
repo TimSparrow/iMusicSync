@@ -39,9 +39,14 @@ class Album extends AbstractEntity{
 	public static function getList()
 	{
 		$pdo = \ImportCommand::getPdo();
-		$query = 'SELECT * FROM album ORDER BY sort_album';
-		$albums = $pdo->query($query, \PDO::FETCH_CLASS, get_class());
-		return $albums;
+		$query = "SELECT * FROM album "
+				. "WHERE feed_url='' AND keep_local > 0 "		// skip podcasts and ebooks
+				. "ORDER BY sort_album";
+		if(!$albums = $pdo->query($query, \PDO::FETCH_CLASS, get_class()))
+		{
+			throw new \Exception("DB Error: $query fails\n");
+		}
+		return $albums->fetchAll();
 	}
 
 	public function getTracks()

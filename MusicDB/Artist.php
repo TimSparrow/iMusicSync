@@ -37,8 +37,8 @@ class Artist extends AbstractEntity
 	public static function getById($id)
 	{
 		$query = "SELECT * FROM album_artist WHERE album_artist_pid=?";
-		$stm = $this->pdo->prepare($query);
-		$stm->setFetchMode(PDO::FETCH_CLASS, get_class());
+		$stm = self::$pdo->prepare($query);
+		$stm->setFetchMode(\PDO::FETCH_CLASS, get_class());
 		if ($stm->execute(Array($id)))
 		{
 			return $stm->fetch();
