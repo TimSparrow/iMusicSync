@@ -17,7 +17,7 @@ spl_autoload_register(function($name){
 
 class ImportCommand extends \ConsoleKit\Command{
 	const iPhoneDir = '~/backups/iphone/'; // change to the dir iPhone is mounted to on production version
-	const iTunesDB = 'iTunesControl';
+	const iTunesDB = 'iTunes_Control';
 	const dbFile = 'iTunes/MediaLibrary.sqlitedb';
 	const sourcePath = '/Music';
 	const targetPath = '~/Music';
@@ -71,24 +71,32 @@ class ImportCommand extends \ConsoleKit\Command{
 			self::$pdo = new \PDO($schema);
 			self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-			if($this->useRecode)
-			{
-				$this->cmd = $this->cmdRecode;
-			}
-			elseif($this->useLinks)
-			{
-				$this->cmd = $this->cmdLink;
-			}
-			else
-			{
-				$this->cmd = $this->cmdCopy;
-			}
+			$this->initCmd();
+		}
+	}
+
+	private function initCmd()
+	{
+		if($this->useRecode)
+		{
+			$this->cmd = $this->cmdRecode;
+			$this->writeln("Recode mode selected");
+		}
+		elseif($this->useLinks)
+		{
+			$this->cmd = $this->cmdLink;
+			$this->writeln("Hard link mode selected");
+		}
+		else
+		{
+			$this->cmd = $this->cmdCopy;
+			$this->writeln("Copy mode selected");
 		}
 	}
 
 	private function getSourcePath()
 	{
-		return $this->getFullPath(self::iPhoneDir).self::iTunesDB . self::sourcePath;
+		return $this->getFullPath(self::iPhoneDir);
 	}
 
 	private static function getFullPath($path)
@@ -109,16 +117,17 @@ class ImportCommand extends \ConsoleKit\Command{
 		{
 			if(filemtime($targetFile) >= filemtime($trackFile))
 			{
-				$this->writeln('target exists');
+				$this->writeln('target exists, skipping');
 				return true;
 			}
 			else {
 				$this->write('target is old, overwriting');
 			}
 		}
-		$command = sprint($this->cmd, $trackFile, $targetFile);
-		//system($command, $res);
-		$this->writeln("\t\tcmd=".$command);
+		$this->write(" copying...");
+		$command = sprintf($this->cmd, $trackFile, $targetFile);
+		system($command, $res);
+		$this->writeln("done");
 	}
 
 	/**
@@ -139,10 +148,10 @@ class ImportCommand extends \ConsoleKit\Command{
 				$this->write($artist . ' // '. $album);
 				$tracks = $album->getTracks();
 				$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
-				$this->writeln(sprintf(" contains %d tracks, saving to \tpath: %s", sizeof($tracks), $path));
+				$this->writeln(sprintf("::Tracks:%d", sizeof($tracks)));
 				foreach($tracks as $track)
 				{
-					$this->writeln("\t".$track);
+					$this->write("\t".$track." --> ");
 					$this->saveTrack($track, $path);
 				}
 				exit;
