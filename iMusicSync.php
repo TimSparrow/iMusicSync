@@ -89,7 +89,7 @@ class ImportCommand extends \ConsoleKit\Command{
 	{
 		$this->init();
 		$this->albums = Album::getList();
-		echo sprintf("Got %d albums:\n", $this->albums->count);
+		echo sprintf("Got %d albums\n", sizeof($this->albums));
 		foreach($this->albums as $album)
 		{
 			$artist = $album->getArtist();
