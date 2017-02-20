@@ -53,6 +53,7 @@ class Config
 	);
 	private static $instance=null;
 	private $config=null;
+	private $home=null;
 
 	/**
 	 * private constructor for singleton tpl
@@ -119,6 +120,15 @@ class Config
 	protected function loadConfig($file)
 	{
 		$this->config = parse_ini_file($file, false);
+	}
+
+	public static function getFullPath($path)
+	{
+		if(null===self::$home)
+		{
+			self::$home = getenv('HOME');
+		}
+		return str_replace('~', self::$home, $path);;
 	}
 
 }

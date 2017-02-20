@@ -9,7 +9,7 @@ namespace TimSparrow\Commands;
 use TimSparrow\MusicDB\Artist;
 use TimSparrow\MusicDB\Album;
 use TimSparrow\MusicDB\Track;
-
+use TimSparrow\Config;
 
 /**
  * Export iPhone music database to filesystem
@@ -20,14 +20,15 @@ use TimSparrow\MusicDB\Track;
  *
  * @author TimSparrow
  */
-class ExportCommand extends \ConsoleKit\Command{
-
-	private static $pdo = null;	// database handler
+class ExportCommand extends \ConsoleKit\Command
+{
 	private $albums;
-	private static $home;		// user home
 	private static $mode=0755;	// directory create mode
 
-
+	private function getConfig($name)
+	{
+		return Config::get($name);
+	}
 
 	/**
 	 * Constructs and returns a path to save tracks for a given album
@@ -47,57 +48,37 @@ class ExportCommand extends \ConsoleKit\Command{
 		return $exportPath;
 	}
 
-	public static function getPdo()
-	{
-		return self::$pdo;
-	}
-
 	private function init()
 	{
-		if(self::$pdo == null)
-		{
-			$file = $this->getPdoFileName();
-			$schema = 'sqlite:'.$file;
-			echo "Using $file as database\n";
-			self::$pdo = new \PDO($schema);
-			self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-			$this->initCmd();
-		}
+		DB::init();
+		$this->initCmd();
 	}
 
 	private function initCmd()
 	{
-		if($this->useRecode)
+		if(Config::get('useRecode'))
 		{
-			$this->cmd = $this->cmdRecode;
+			$this->cmd = Config::get('cmdRecode');
 			$this->writeln("Recode mode selected");
 		}
-		elseif($this->useLinks)
+		elseif(Config::get('useLinks'))
 		{
-			$this->cmd = $this->cmdLink;
+			$this->cmd = Config::get('cmdLink');
 			$this->writeln("Hard link mode selected");
 		}
 		else
 		{
-			$this->cmd = $this->cmdCopy;
+			$this->cmd = Config::get('cmdCopy');
 			$this->writeln("Copy mode selected");
 		}
 	}
 
 	private function getSourcePath()
 	{
-		return $this->getFullPath(self::iPhoneDir);
+		return $this->getFullPath(Config::get('iPhoneDir'));
 	}
 
-	private static function getFullPath($path)
-	{
-		if(null===self::$home)
-		{
-			self::$home = getenv('HOME');
-		}
-		return str_replace('~', self::$home, $path);;
-	}
+	
 
 	private function saveTrack($track, $path)
 	{
@@ -140,7 +121,7 @@ class ExportCommand extends \ConsoleKit\Command{
 		try
 		{
 			$this->albums = Album::getList();
-			echo sprintf("Got %d albums\n", sizeof($this->albums));
+			$this->writeln(sprintf("Got %d albums", sizeof($this->albums)));
 			foreach($this->albums as $album)
 			{
 				$artist = $album->getArtist();
@@ -160,7 +141,7 @@ class ExportCommand extends \ConsoleKit\Command{
 		{
 			$this->writerr("Database exception: ".$x->getMessage());
 			$this->writerr(print_r($x->errorInfo, true));
-			$this->writeerr($x->getTraceAsString());
+			$this->writerr($x->getTraceAsString());
 			exit;
 		}
 	}

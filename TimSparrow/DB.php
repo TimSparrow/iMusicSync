@@ -29,9 +29,12 @@ class DB
 {
 	private static $db = null;
 
+	/**
+	 * Singleton private constructor
+	 */
 	private function __construct()
 	{
-		;
+		
 	}
 
 	/**
@@ -40,6 +43,24 @@ class DB
 	 */
 	private static function getPdoFileName()
 	{
-		return self::getFullPath(self::iPhoneDir). self::iTunesDB . '/' . self::dbFile;
+		return Config::getFullPath(Config::get('iPhoneDir')). Config::get('iTunesDB') . '/' . Config::get('dbFile');
+	}
+
+	public static function init()
+	{
+		if(null === self::$db)
+		{
+			$file = self::getPdoFileName();
+			$schema = 'sqlite:'.$file;
+			trigger_error("Using $file as database", E_USER_NOTICE);
+			self::$db = new \PDO($schema);
+			self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		}
+		return self::$db;
+	}
+
+	public static function get()
+	{
+		return self::$db;
 	}
 }

@@ -2,6 +2,7 @@
 <?php
 require_once 'vendor/autoload.php';
 use TimSparrow\Commands\ExportCommand;
+use TimSparrow\Commands\ImportCommand;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates

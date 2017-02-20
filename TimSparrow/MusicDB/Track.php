@@ -7,11 +7,11 @@
  */
 
 namespace TimSparrow\MusicDB;
-
+use TimSparrow\DB;
 /**
  * Description of Track
  *
- * @author timofey
+ * @author TimSparrow
  */
 class Track extends AbstractEntity
 {
@@ -70,7 +70,7 @@ class Track extends AbstractEntity
 			. "	AND item.keep_local > 0 "				// skip podcasts
 			. "ORDER by disc_number,track_number";
 
-		$stm = self::$pdo->prepare($query);
+		$stm = DB::get()->prepare($query);
 		if(!$stm)
 		{
 			throw new \Exception("Failed to prepare $query");

@@ -7,6 +7,7 @@
  */
 
 namespace TimSparrow\MusicDB;
+use TimSparrow\DB;
 
 /**
  * Description of AbstractEntity
@@ -16,17 +17,14 @@ namespace TimSparrow\MusicDB;
 abstract class AbstractEntity
 {
 	private $attributes;
-	protected static $pdo =  null;
+
 	public function __construct()
 	{
 		if(!is_array($this->attributes))
 		{
 			$this->attributes = Array();
 		}
-		if(null===self::$pdo)
-		{
-			self::$pdo = \ExportCommand::getPdo();
-		}
+
 	}
 
 	/**

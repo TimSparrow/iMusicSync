@@ -1,5 +1,7 @@
 <?php
 namespace TimSparrow\MusicDB;
+use TimSparrow\DB;
+use TimSparrow\Config;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -38,11 +40,10 @@ class Album extends AbstractEntity{
 	 */
 	public static function getList()
 	{
-		$pdo = \ExportCommand::getPdo();
 		$query = "SELECT * FROM album "
 				. "WHERE feed_url='' AND keep_local > 0 "		// skip podcasts and ebooks
 				. "ORDER BY sort_album";
-		if(!$albums = $pdo->query($query, \PDO::FETCH_CLASS, get_class()))
+		if(!$albums = DB::get()->query($query, \PDO::FETCH_CLASS, get_class()))
 		{
 			throw new \Exception("DB Error: $query fails\n");
 		}

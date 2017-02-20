@@ -7,6 +7,7 @@
  */
 
 namespace TimSparrow\MusicDB;
+use TimSparrow\DB;
 
 /**
  * Container for an Artist entity
@@ -37,7 +38,7 @@ class Artist extends AbstractEntity
 	public static function getById($id)
 	{
 		$query = "SELECT * FROM album_artist WHERE album_artist_pid=?";
-		$stm = self::$pdo->prepare($query);
+		$stm = DB::get()->prepare($query);
 		$stm->setFetchMode(\PDO::FETCH_CLASS, get_class());
 		if ($stm->execute(Array($id)))
 		{

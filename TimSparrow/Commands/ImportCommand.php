@@ -13,7 +13,10 @@ namespace TimSparrow\Commands;
  *
  * @author timofey
  */
-class ImportCommand
+class ImportCommand extends \ConsoleKit\Command
 {
-	//put your code here
+	public function execute(array $args, array $options = array())
+	{
+		$this->writeerr("Command not implemented");
+	}
 }
