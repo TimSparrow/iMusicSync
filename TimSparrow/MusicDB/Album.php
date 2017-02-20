@@ -62,5 +62,9 @@ class Album extends AbstractEntity{
 	{
 		return Artist::getById($this->album_artist_pid);
 	}
-	
+
+	public function getId3Tags($version = 2)
+	{
+		return Array('Talb' => $this->album);
+	}
 }

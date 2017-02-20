@@ -32,6 +32,7 @@ class Config
 	 * Config file name
 	 */
 	const configFile = './iMusicSync.ini';
+	const version = '0.1.0';
 	/**
 	 * default values
 	 * overriden by config.ini values
@@ -42,8 +43,8 @@ class Config
 		'iPhoneDir'		=> '~/backups/iphone/',				// change to the dir iPhone is mounted to on production version
 		'iTunesDB'		=> 'iTunes_Control',
 		'dbFile'		=> 'iTunes/MediaLibrary.sqlitedb',
-		'sourcePath'	=> '/Music',
-		'targetPath'	=> '~/Music',
+		'musicLibPath'	=> '/Music',
+		'exportTargetPath'	=> '~/Music',
 
 		'useLinks'		=> true,	// use hard links (debug only, ignored if useRecode=true), deprecated
 		'useRecode'		=> true,	// recode files to mp3
@@ -105,6 +106,11 @@ class Config
 			trigger_error("Undefined config property $name", E_USER_WARNING);
 			return null;
 		}
+	}
+
+	public static function getSoftware()
+	{
+		return sprintf("iMusicSync v%s", self::version);
 	}
 
 	/**

@@ -80,15 +80,15 @@ class Track extends AbstractEntity
 		return $stm->fetchAll();
 	}
 
-	public function updateTags($file)
+	
+
+	public function getId3Tags($version=2)
 	{
-		if(null==$this->album)
-		{
-			throw new Exception('Album not set');
-		}
-		if(null==$this->artist)
-		{
-			throw new Exception('Artist not set');
-		}
+		return Array(
+			'Tit2'	=> $this->title,
+			'Time'	=> $this->getId3Time(),
+			'Trck'	=> $this->track_number,
+			'Tpos'	=> $this->disc_number
+		);
 	}
 }

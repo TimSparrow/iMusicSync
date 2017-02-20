@@ -45,4 +45,9 @@ class Artist extends AbstractEntity
 			return $stm->fetch();
 		}
 	}
+
+	public function getId3Tags($version = 2)
+	{
+		return Array('Tpe1' => $this->artist);
+	}
 }

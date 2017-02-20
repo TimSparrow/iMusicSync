@@ -23,7 +23,16 @@ use TimSparrow\Config;
 class ExportCommand extends \ConsoleKit\Command
 {
 	private $albums;
+	private $album;
+	private $artist;
+	private $track;
+	private $targetPath;
 
+	/**
+	 * Wrapper to get config value
+	 * @param String $name
+	 * @return Mixed
+	 */
 	private function getConfig($name)
 	{
 		return Config::get($name);
@@ -33,15 +42,16 @@ class ExportCommand extends \ConsoleKit\Command
 	 * Constructs and returns a path to save tracks for a given album
 	 * @param array $pathComponents - array like artist, album, etc.
 	 * @return string - path
+	 * @throws \Exception if dir creation fails
 	 */
 	private function createPathForTracks(Array $pathComponents)
 	{
-		$exportPath = self::getFullPath(self::targetPath) . '/' . implode('/', $pathComponents);
+		$exportPath = Config::getFullPath($this->targetPath) . '/' . implode('/', $pathComponents);
 		if(!is_dir($exportPath))
 		{
 			if(!mkdir($exportPath, Config::get(exportDirMode), true))
 			{
-				throw new Exception("Failed to create directory $exportPath");
+				throw new \Exception("Failed to create directory $exportPath");
 			}
 		}
 		return $exportPath;
@@ -50,6 +60,7 @@ class ExportCommand extends \ConsoleKit\Command
 	private function init()
 	{
 		DB::init();
+		$this->targetPath = $this->getConfig('exportTargetPath');
 		$this->initCmd();
 	}
 
@@ -96,17 +107,35 @@ class ExportCommand extends \ConsoleKit\Command
 			}
 		}
 		// write after this point
-
-
 		$this->write(" copying...");
 		$command = sprintf($this->cmd, $trackFile, $targetFile);
 		system($command, $res);
 		if($this->useRecode)
 		{
-			$track->updateTags($targetFile);
+			$this->updateTags($targetFile);
 		}
 
 		$this->writeln("done");
+	}
+
+
+	private function updateTags($file, $a)
+	{
+		$id3Frames = array_merge($this->track->getId3Tags(), $this->album->getId3Tags(), $this->artist->getId3Tags(), $this->getId3Tags());
+		$idManager = new Zend_Media_Id3v2($file);
+		foreach($id3Frames as $frame => $content)
+		{
+			$frameClass = 'Zend_Media_Id3_Frame_'.$frame;
+			$frameObject = new $frameClass;
+			$frameObject->setText($content);
+			$idManager->addFrame($frameObject);
+		}
+		$idManager->write();
+	}
+
+	public function getId3Tags()
+	{
+		return Array('Tenc'	=> Config::getSoftware());
 	}
 
 	/**
@@ -121,17 +150,17 @@ class ExportCommand extends \ConsoleKit\Command
 		{
 			$this->albums = Album::getList();
 			$this->writeln(sprintf("Got %d albums", sizeof($this->albums)));
-			foreach($this->albums as $album)
+			foreach($this->albums as $this->album)
 			{
-				$artist = $album->getArtist();
-				$this->write($artist . ' // '. $album);
-				$tracks = $album->getTracks();
-				$path = $this->createPathForTracks(Array($artist->getPathName(), $album->getPathName()));
+				$this->artist = $this->album->getArtist();
+				$this->write($this->artist . ' // '. $this->album);
+				$tracks = $this->album->getTracks();
+				$path = $this->createPathForTracks(Array($this->artist->getPathName(), $this->album->getPathName()));
 				$this->writeln(sprintf("::Tracks:%d", sizeof($tracks)));
-				foreach($tracks as $track)
+				foreach($tracks as $this->track)
 				{
 					$this->write("\t".$track." --> ");
-					$this->saveTrack($track, $path);
+					$this->saveTrack($this->track, $path);
 				}
 				exit;
 			}
