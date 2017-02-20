@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace MusicDB;
+namespace TimSparrow\MusicDB;
 
 /**
  * Container for an Artist entity

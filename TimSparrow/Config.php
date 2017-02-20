@@ -1,0 +1,124 @@
+<?php
+
+/*
+ * Copyright (C) 2017 TimSparrow
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+namespace TimSparrow;
+use TimSparrow\Exceptions\ConfigException;
+
+/**
+ * Description of Config
+ *
+ * @author TimSparrow
+ */
+class Config
+{
+	/**
+	 * Config file name
+	 */
+	const configFile = './iMusicSync.ini';
+	/**
+	 * default values
+	 * overriden by config.ini values
+	 * or (in future) by command line overrides
+	 * @var Array
+	 */
+	private $defaults = Array(
+		'iPhoneDir'		=> '~/backups/iphone/',				// change to the dir iPhone is mounted to on production version
+		'iTunesDB'		=> 'iTunes_Control',
+		'dbFile'		=> 'iTunes/MediaLibrary.sqlitedb',
+		'sourcePath'	=> '/Music',
+		'targetPath'	=> '~/Music',
+
+		'useLinks'		=> true,	// use hard links (debug only, ignored if useRecode=true)
+		'useRecode'		=> true,	// recode files to mp3
+		'cmdRecode'		=> "ffmpeg -y -loglevel error -hide_banner -i %1s %2s",	// recode command
+		'cmdCopy'		=> "cp %1s %2s",		// copy command
+		'cmdLink'		=> "ln %1s %2s"			// link command
+	);
+	private static $instance=null;
+	private $config=null;
+
+	/**
+	 * private constructor for singleton tpl
+	 */
+	private function __construct()
+	{
+		if(file_exists(self::configFile))
+		{
+			$this->loadConfig(self::configFile);
+		}
+	}
+
+	/**
+	 * Singleton instance
+	 * @return Config
+	 */
+	public static function getInstance()
+	{
+		if(null===self::$instance)
+		{
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	/**
+	 * Returns config option. If not found, returns a default value
+	 * If no default given, returns null and issues a warning
+	 * @param String $name
+	 * @return Mixed
+	 */
+	public function __get($name)
+	{
+		if(is_array($this->config) && array_key_exists($name, $this->config))
+		{
+			return $this->config[$name];
+		}
+		elseif(array_key_exists($name, $this->defaults))
+		{
+			return $this->defaults[$name];
+		}
+		else
+		{
+			trigger_error("Undefined config property $name", E_USER_WARNING);
+			return null;
+		}
+	}
+
+	/**
+	 * @see self::getInstance->$name
+	 * @param String $name
+	 * @return Mixed
+	 */
+	public static function get($name)
+	{
+		return self::getInstance()->$name;
+	}
+
+	/**
+	 * Loads an .ini-style config file into $this->config
+	 * @see parse_ini_file
+	 * @param String $file
+	 */
+	protected function loadConfig($file)
+	{
+		$this->config = parse_ini_file($file, false);
+	}
+
+}

@@ -1,5 +1,5 @@
 <?php
-namespace MusicDB;
+namespace TimSparrow\MusicDB;
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -38,7 +38,7 @@ class Album extends AbstractEntity{
 	 */
 	public static function getList()
 	{
-		$pdo = \ImportCommand::getPdo();
+		$pdo = \ExportCommand::getPdo();
 		$query = "SELECT * FROM album "
 				. "WHERE feed_url='' AND keep_local > 0 "		// skip podcasts and ebooks
 				. "ORDER BY sort_album";

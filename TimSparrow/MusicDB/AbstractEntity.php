@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace MusicDB;
+namespace TimSparrow\MusicDB;
 
 /**
  * Description of AbstractEntity
@@ -25,7 +25,7 @@ abstract class AbstractEntity
 		}
 		if(null===self::$pdo)
 		{
-			self::$pdo = \ImportCommand::getPdo();
+			self::$pdo = \ExportCommand::getPdo();
 		}
 	}
 
