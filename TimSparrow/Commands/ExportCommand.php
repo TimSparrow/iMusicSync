@@ -23,7 +23,6 @@ use TimSparrow\Config;
 class ExportCommand extends \ConsoleKit\Command
 {
 	private $albums;
-	private static $mode=0755;	// directory create mode
 
 	private function getConfig($name)
 	{
@@ -40,7 +39,7 @@ class ExportCommand extends \ConsoleKit\Command
 		$exportPath = self::getFullPath(self::targetPath) . '/' . implode('/', $pathComponents);
 		if(!is_dir($exportPath))
 		{
-			if(!mkdir($exportPath, self::$mode, true))
+			if(!mkdir($exportPath, Config::get(exportDirMode), true))
 			{
 				throw new Exception("Failed to create directory $exportPath");
 			}

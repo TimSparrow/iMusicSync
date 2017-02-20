@@ -20,4 +20,5 @@ spl_autoload_register(function($name){
 
 $console = new ConsoleKit\Console();
 $console->addCommand('ExportCommand');
+$console->addCommand('ImportCommand');
 $console->run();

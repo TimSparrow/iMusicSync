@@ -45,11 +45,13 @@ class Config
 		'sourcePath'	=> '/Music',
 		'targetPath'	=> '~/Music',
 
-		'useLinks'		=> true,	// use hard links (debug only, ignored if useRecode=true)
+		'useLinks'		=> true,	// use hard links (debug only, ignored if useRecode=true), deprecated
 		'useRecode'		=> true,	// recode files to mp3
 		'cmdRecode'		=> "ffmpeg -y -loglevel error -hide_banner -i %1s %2s",	// recode command
 		'cmdCopy'		=> "cp %1s %2s",		// copy command
-		'cmdLink'		=> "ln %1s %2s"			// link command
+		'cmdLink'		=> "ln %1s %2s",			// link command @deprecated
+
+		'exportDirMode' => 0755	// directory create mode on export
 	);
 	private static $instance=null;
 	private $config=null;
@@ -63,6 +65,9 @@ class Config
 		if(file_exists(self::configFile))
 		{
 			$this->loadConfig(self::configFile);
+		}
+		else {
+			trigger_error(sprintf("Config file %s not found, using defaults", self::configFile), E_USER_WARNING);
 		}
 	}
 
