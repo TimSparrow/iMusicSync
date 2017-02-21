@@ -10,6 +10,7 @@ use TimSparrow\MusicDB\Artist;
 use TimSparrow\MusicDB\Album;
 use TimSparrow\MusicDB\Track;
 use TimSparrow\Config;
+use TimSparrow\DB;
 
 /**
  * Export iPhone music database to filesystem
@@ -57,7 +58,7 @@ class ExportCommand extends \ConsoleKit\Command
 		return $exportPath;
 	}
 
-	private function init()
+	private function init(Array $args, Array $options)
 	{
 		DB::init();
 		$this->targetPath = $this->getConfig('exportTargetPath');
@@ -85,50 +86,91 @@ class ExportCommand extends \ConsoleKit\Command
 
 	private function getSourcePath()
 	{
-		return $this->getFullPath(Config::get('iPhoneDir'));
+		return Config::getFullPath(Config::get('iPhoneDir'));
 	}
 
 	
 
-	private function saveTrack($track, $path)
+	private function saveTrack(Track $track, $path)
 	{
 		$trackFile = $this->getSourcePath().$track->getMediaFile();
 		$targetFile = $path.'/'.$track->getPathName();
+		if($this->isSaveTrackNeeded($trackFile, $targetFile))
+		{
+			// write after this point
+			$this->write(" copying...");
+			$command = sprintf($this->cmd, $trackFile, $targetFile);
+			$res = 0;
+			system($command, $res);
+			if($res > 0)
+			{
+				throw new \Exception(sprintf("Error: command %s returned error code %d", $command, $res));
+			}
+			$this->write('; ');
+			if(!Config::get('useLinks'))
+			{
+				$this->updateTags($targetFile);
+			}
+			$this->writeln("done");
+		}
+	}
 
+	private function isSaveTrackNeeded($trackFile, $targetFile)
+	{
 		if(is_file($targetFile))
 		{
-			if(filemtime($targetFile) >= filemtime($trackFile))
+			if(Config::get('overwrite') == 'none')
+			{
+				$this->write('overwrite disabled, skipping');
+			}
+			elseif(filemtime($targetFile) >= filemtime($trackFile))
 			{
 				$this->writeln('target exists, skipping');
-				return true;
+				return false;
+			}
+			elseif(Config::get('overwrite') == 'all')
+			{
+				$this->write('overwrite is forced');
 			}
 			else {
 				$this->write('target is old, overwriting');
 			}
 		}
-		// write after this point
-		$this->write(" copying...");
-		$command = sprintf($this->cmd, $trackFile, $targetFile);
-		system($command, $res);
-		if($this->useRecode)
-		{
-			$this->updateTags($targetFile);
+		else {
+			$this->write('writing');
 		}
-
-		$this->writeln("done");
+		return true;
 	}
 
 
-	private function updateTags($file, $a)
+	private function updateTags($file)
 	{
 		$id3Frames = array_merge($this->track->getId3Tags(), $this->album->getId3Tags(), $this->artist->getId3Tags(), $this->getId3Tags());
-		$idManager = new Zend_Media_Id3v2($file);
+		
+
+		$this->write('Updating ID3 tags');
+		print_r($id3Frames);
+		exit;
+
+		$idManager = new \Zend_Media_Id3v2($file);
 		foreach($id3Frames as $frame => $content)
 		{
-			$frameClass = 'Zend_Media_Id3_Frame_'.$frame;
-			$frameObject = new $frameClass;
-			$frameObject->setText($content);
-			$idManager->addFrame($frameObject);
+			// check if frame exists
+			$currentFrames = $idManager->getFramesByIdentifier(strtoupper($frame));
+			if(sizeof($currentFrames) > 0)
+			{
+				if(strtolower($frame) != 'tenc') // do not update encoder
+				{
+					$currentFrames[0]->setText($content);
+				}
+			}
+			else
+			{
+				$frameClass = '\\Zend_Media_Id3_Frame_'.$frame;
+				$frameObject = new $frameClass;
+				$frameObject->setText($content);
+				$idManager->addFrame($frameObject);
+			}
 		}
 		$idManager->write();
 	}
@@ -145,32 +187,27 @@ class ExportCommand extends \ConsoleKit\Command
 	 */
 	public function execute(array $args, array $options = array())
 	{
-		$this->init();
-		try
+		$this->init($args, $options);
+		$this->albums = Album::getList();
+		$this->writeln(sprintf("Got %d albums", sizeof($this->albums)));
+		foreach($this->albums as $this->album)
 		{
-			$this->albums = Album::getList();
-			$this->writeln(sprintf("Got %d albums", sizeof($this->albums)));
-			foreach($this->albums as $this->album)
-			{
-				$this->artist = $this->album->getArtist();
-				$this->write($this->artist . ' // '. $this->album);
-				$tracks = $this->album->getTracks();
-				$path = $this->createPathForTracks(Array($this->artist->getPathName(), $this->album->getPathName()));
-				$this->writeln(sprintf("::Tracks:%d", sizeof($tracks)));
-				foreach($tracks as $this->track)
-				{
-					$this->write("\t".$track." --> ");
-					$this->saveTrack($this->track, $path);
-				}
-				exit;
-			}
+			$this->artist = $this->album->getArtist();
+			$this->write($this->artist . ' // '. $this->album);
+			$this->processTracks($this->album->getTracks());
+			exit;	// debug - process one album only
 		}
-		catch (\PDOException $x)
+
+	}
+
+	private function processTracks($tracks)
+	{
+		$path = $this->createPathForTracks(Array($this->artist->getPathName(), $this->album->getPathName()));
+		$this->writeln(sprintf("::Tracks:%d", sizeof($tracks)));
+		foreach($tracks as $this->track)
 		{
-			$this->writerr("Database exception: ".$x->getMessage());
-			$this->writerr(print_r($x->errorInfo, true));
-			$this->writerr($x->getTraceAsString());
-			exit;
+			$this->write("\t".$this->track." --> ");
+			$this->saveTrack($this->track, $path);
 		}
 	}
 }

@@ -17,8 +17,9 @@ class Track extends AbstractEntity
 {
 	const pattern = "%d_%02d_%s.%s";
 
-	private $album=null;
-	private $artist=null;
+	private $_album=null;
+	private $_artist=null;
+	private $_time=null;
 	
 	public function getPathName()
 	{
@@ -59,6 +60,9 @@ class Track extends AbstractEntity
 			. "	genre.genre AS genre,"
 			. "	item_extra.title AS title,"
 			. "	item_extra.location AS filename,"
+			. " item_extra.disc_count AS disc_count,"
+			. " item_extra.track_count AS track_count,"
+			. " item_extra.total_time_ms AS track_time,"
 			. "	base_location.path AS path,"
 			. "	item_playback.bit_rate AS bitrate "
 			. "FROM item JOIN item_extra ON item.item_pid = item_extra.item_pid "
@@ -87,8 +91,27 @@ class Track extends AbstractEntity
 		return Array(
 			'Tit2'	=> $this->title,
 			'Time'	=> $this->getId3Time(),
+			'Tlen'	=> $this->getId3Len(),
 			'Trck'	=> $this->track_number,
 			'Tpos'	=> $this->disc_number
 		);
 	}
+
+	private function getId3Time(){
+		return $this->getTrackTime('Hi');
+	}
+
+	private function getId3Len(){
+		return $this->getTrackTime('H:i:s.u');
+	}
+
+	protected function getTrackTime($format=null)
+	{
+		if(null===$this->_time)
+		{
+			$this->_time = \DateTime::createFromFormat('U.u', $this->track_time / 1000);
+		}
+		return $this->_time->format($format);
+	}
+
 }

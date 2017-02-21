@@ -48,6 +48,6 @@ class Artist extends AbstractEntity
 
 	public function getId3Tags($version = 2)
 	{
-		return Array('Tpe1' => $this->artist);
+		return Array('Tpe1' => $this->album_artist);
 	}
 }

@@ -46,17 +46,17 @@ class Config
 		'musicLibPath'	=> '/Music',
 		'exportTargetPath'	=> '~/Music',
 
-		'useLinks'		=> true,	// use hard links (debug only, ignored if useRecode=true), deprecated
-		'useRecode'		=> true,	// recode files to mp3
+		'useLinks'		=> false,	// use hard links (debug only, ignored if useRecode=true), deprecated
+		'useRecode'		=> false,	// recode files to mp3
 		'cmdRecode'		=> "ffmpeg -y -loglevel error -hide_banner -i %1s %2s",	// recode command
 		'cmdCopy'		=> "cp %1s %2s",		// copy command
 		'cmdLink'		=> "ln %1s %2s",			// link command @deprecated
-
+		'overwrite'		=> 'newer',					// overwrite files that exist [newer] | all | none
 		'exportDirMode' => 0755	// directory create mode on export
 	);
 	private static $instance=null;
 	private $config=null;
-	private $home=null;
+	private static $home=null;
 
 	/**
 	 * private constructor for singleton tpl
@@ -142,4 +142,34 @@ class Config
 		return str_replace('~', self::$home, $path);;
 	}
 
+
+	public static function init($args, $options)
+	{
+		$this->getInstance()->setOptions($args, $options);
+	}
+
+	protected function setOptions($args, $options)
+	{
+		unset($args);
+		foreach($options as $key => $value)
+		{
+			if(array_key_exists($key, $this->config))
+			{
+				trigger_error(sprintf("CLI: Using %s ==> %s", $key, $value), E_USER_NOTICE);
+				$this->config[$key] = $value;
+			}
+			else {
+				trigger_error(sprintf("CLI: Ignoring invalid option %s", $key));
+			}
+		}
+	}
+
+	/**
+	 * Returns array of keys for
+	 * @return Array
+	 */
+	public static function getKeys()
+	{
+		return array_seys($this->getInstance()->defaults);
+	}
 }

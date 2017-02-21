@@ -54,7 +54,7 @@ class DB
 			$schema = 'sqlite:'.$file;
 			trigger_error("Using $file as database", E_USER_NOTICE);
 			self::$db = new \PDO($schema);
-			self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			self::$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 		}
 		return self::$db;
 	}
