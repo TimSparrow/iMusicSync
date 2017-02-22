@@ -94,7 +94,7 @@ class ExportCommand extends \ConsoleKit\Command
 	private function saveTrack(Track $track, $path)
 	{
 		$trackFile = $this->getSourcePath().$track->getMediaFile();
-		$targetFile = $path.'/'.$track->getPathName();
+		$targetFile = $path.'/'.$track->getPathName() . Config::get(useRecode) ? '.mp3' : $track->getFileExtension();
 		if($this->isSaveTrackNeeded($trackFile, $targetFile))
 		{
 			// write after this point
@@ -146,13 +146,18 @@ class ExportCommand extends \ConsoleKit\Command
 	private function updateTags($file)
 	{
 		$id3Frames = array_merge($this->track->getId3Tags(), $this->album->getId3Tags(), $this->artist->getId3Tags(), $this->getId3Tags());
-		
 
 		$this->write('Updating ID3 tags');
 		print_r($id3Frames);
-		exit;
 
-		$idManager = new \Zend_Media_Id3v2($file);
+		try {
+			$idManager = new \Zend_Media_Id3v2($file);
+		}
+		catch(\Zend_Media_Id3_Exception $e)
+		{
+			$idManager = new \Zend_Media_Id3v2();
+			trigger_error(sprintf("Cannot read Id3 from %s: %s", $file, $e->getMessage()), E_USER_WARNING);
+		}
 		foreach($id3Frames as $frame => $content)
 		{
 			// check if frame exists
@@ -172,7 +177,10 @@ class ExportCommand extends \ConsoleKit\Command
 				$idManager->addFrame($frameObject);
 			}
 		}
-		$idManager->write();
+		$rc = $idManager->write($file);
+		$this->writeln('done, rc=');
+		var_dump($rc);
+		exit;
 	}
 
 	public function getId3Tags()

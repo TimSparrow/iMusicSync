@@ -61,7 +61,7 @@ abstract class AbstractEntity
 
 	/**
 	 * Return a subset of Id3 tags relevant to this entity
-	 * @param int $version version of id3 tags to return
+	 * @param int $version version of id3 tags to return, assumed 2, ignored
 	 * @return Array
 	 */
 	public abstract function getId3Tags($version=2);

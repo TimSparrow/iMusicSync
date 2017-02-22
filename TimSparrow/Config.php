@@ -47,7 +47,7 @@ class Config
 		'exportTargetPath'	=> '~/Music',
 
 		'useLinks'		=> false,	// use hard links (debug only, ignored if useRecode=true), deprecated
-		'useRecode'		=> false,	// recode files to mp3
+		'useRecode'		=> true,	// recode files to mp3
 		'cmdRecode'		=> "ffmpeg -y -loglevel error -hide_banner -i %1s %2s",	// recode command
 		'cmdCopy'		=> "cp %1s %2s",		// copy command
 		'cmdLink'		=> "ln %1s %2s",			// link command @deprecated

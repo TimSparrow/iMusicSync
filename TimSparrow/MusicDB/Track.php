@@ -23,7 +23,7 @@ class Track extends AbstractEntity
 	
 	public function getPathName()
 	{
-		return sprintf(self::pattern,  $this->disc_number, $this->track_number, $this->normalize($this->title), $this->getFileExtension());
+		return sprintf(self::pattern,  $this->disc_number, $this->track_number, $this->normalize($this->title));
 	}
 
 	public function getId()
@@ -63,6 +63,7 @@ class Track extends AbstractEntity
 			. " item_extra.disc_count AS disc_count,"
 			. " item_extra.track_count AS track_count,"
 			. " item_extra.total_time_ms AS track_time,"
+			. " item_extra.file_size AS file_size,"
 			. "	base_location.path AS path,"
 			. "	item_playback.bit_rate AS bitrate "
 			. "FROM item JOIN item_extra ON item.item_pid = item_extra.item_pid "
@@ -93,18 +94,34 @@ class Track extends AbstractEntity
 			'Time'	=> $this->getId3Time(),
 			'Tlen'	=> $this->getId3Len(),
 			'Trck'	=> $this->track_number,
-			'Tpos'	=> $this->disc_number
+			'Tpos'	=> $this->disc_number,
+			'Tsiz'	=> $this->file_size
 		);
 	}
 
+	/**
+	 * Track duration in format required by ID3 for TIME tag
+	 * @return \String
+	 */
 	private function getId3Time(){
 		return $this->getTrackTime('Hi');
 	}
 
+	/**
+	 * Track duration in format required by ID3 for TLEN tag
+	 * @return String
+	 */
 	private function getId3Len(){
 		return $this->getTrackTime('H:i:s.u');
 	}
 
+	/**
+	 * Decodes track time from database and stores it internally
+	 * as a DateTime object
+	 * @param String $format - used to convert DateTime object
+	 * @see DateTime::format
+	 * @return String
+	 */
 	protected function getTrackTime($format=null)
 	{
 		if(null===$this->_time)
