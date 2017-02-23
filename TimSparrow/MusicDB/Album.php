@@ -67,7 +67,6 @@ class Album extends AbstractEntity{
 	{
 		$tags = Array(
 			'Talb' => $this->album,
-			'Tyer' => $this->album_year,	//deprecated Id3v2.3 tag
 			'Tdrl' => $this->album_year,	//valid since Id3V2.4
 			'Tdtg' => date('Y-m-d')
 		);
