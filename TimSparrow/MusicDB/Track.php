@@ -15,7 +15,7 @@ use TimSparrow\DB;
  */
 class Track extends AbstractEntity
 {
-	const pattern = "%d_%02d_%s.%s";
+	const pattern = "%d_%02d_%s";
 
 	private $_album=null;
 	private $_artist=null;
@@ -91,16 +91,15 @@ class Track extends AbstractEntity
 	{
 		return Array(
 			'Tit2'	=> $this->title,
-			'Time'	=> $this->getId3Time(),
 			'Tlen'	=> $this->getId3Len(),
 			'Trck'	=> $this->track_number,
 			'Tpos'	=> $this->disc_number,
-			'Tsiz'	=> $this->file_size
 		);
 	}
 
 	/**
 	 * Track duration in format required by ID3 for TIME tag
+	 * @deprecated since version Id3v2.4 (frame TIME)
 	 * @return \String
 	 */
 	private function getId3Time(){

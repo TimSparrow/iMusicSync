@@ -28,6 +28,7 @@ class ExportCommand extends \ConsoleKit\Command
 	private $artist;
 	private $track;
 	private $targetPath;
+	private $msgProgress='copying';
 
 	/**
 	 * Wrapper to get config value
@@ -71,16 +72,19 @@ class ExportCommand extends \ConsoleKit\Command
 		{
 			$this->cmd = Config::get('cmdRecode');
 			$this->writeln("Recode mode selected");
+			$this->msgProgress = ' Recoding...';
 		}
 		elseif(Config::get('useLinks'))
 		{
 			$this->cmd = Config::get('cmdLink');
 			$this->writeln("Hard link mode selected");
+			$this->msgProgress = ' Linking...';
 		}
 		else
 		{
 			$this->cmd = Config::get('cmdCopy');
 			$this->writeln("Copy mode selected");
+			$this->msgProgress = ' Copying...';
 		}
 	}
 
@@ -94,11 +98,11 @@ class ExportCommand extends \ConsoleKit\Command
 	private function saveTrack(Track $track, $path)
 	{
 		$trackFile = $this->getSourcePath().$track->getMediaFile();
-		$targetFile = $path.'/'.$track->getPathName() . Config::get(useRecode) ? '.mp3' : $track->getFileExtension();
+		$targetFile = $path.'/'.$track->getPathName() .'.'. (Config::get('useRecode') ? 'mp3' : $track->getFileExtension());
 		if($this->isSaveTrackNeeded($trackFile, $targetFile))
 		{
 			// write after this point
-			$this->write(" copying...");
+			$this->write($this->msgProgress);
 			$command = sprintf($this->cmd, $trackFile, $targetFile);
 			$res = 0;
 			system($command, $res);

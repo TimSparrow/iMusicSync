@@ -65,6 +65,10 @@ class Album extends AbstractEntity{
 
 	public function getId3Tags($version = 2)
 	{
-		return Array('Talb' => $this->album, 'Tyer' => $this->album_year);
+		return Array(
+			'Talb' => $this->album,
+			'Tyer' => $this->album_year,	//deprecated Id3v2.3 tag
+			'Tdrl' => $this->album_year		//valid since Id3V2.4
+		);
 	}
 }
