@@ -140,9 +140,6 @@ class ExportCommand extends \ConsoleKit\Command
 				$this->write('target is old, overwriting');
 			}
 		}
-		else {
-			$this->write('writing');
-		}
 		return true;
 	}
 
