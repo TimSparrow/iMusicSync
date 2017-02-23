@@ -94,6 +94,7 @@ class Track extends AbstractEntity
 			'Tlen'	=> $this->getId3Len(),
 			'Trck'	=> $this->track_number,
 			'Tpos'	=> $this->disc_number,
+			'Tcon'	=> $this->genre
 		);
 	}
 

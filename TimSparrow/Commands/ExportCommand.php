@@ -186,7 +186,10 @@ class ExportCommand extends \ConsoleKit\Command
 
 	public function getId3Tags()
 	{
-		return Array('Tenc'	=> Config::getSoftware());
+		return Array(
+			'Tenc'	=> Config::getSoftware(),
+			'Tdtg' => date('Y-m-d H:i:s')
+		);
 	}
 
 	/**

@@ -67,8 +67,7 @@ class Album extends AbstractEntity{
 	{
 		$tags = Array(
 			'Talb' => $this->album,
-			'Tdrl' => $this->album_year,	//valid since Id3V2.4
-			'Tdtg' => date('Y-m-d')
+			'Tdrl' => $this->album_year	//valid since Id3V2.4
 		);
 		if(isset($this->album_sort))
 		{
