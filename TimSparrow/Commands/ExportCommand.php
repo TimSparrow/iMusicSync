@@ -29,6 +29,7 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 	private $track;
 	private $targetPath;
 	private $msgProgress='copying';
+	private $idManager=null;
 
 	/**
 	 * Wrapper to get config value
@@ -144,44 +145,54 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 	}
 
 
+	/**
+	 * Updates id3 tags for a file
+	 * @param \String $file
+	 * @throws \Exception on errors
+	 */
 	private function updateTags($file)
 	{
 		$id3Frames = array_merge($this->track->getId3Tags(), $this->album->getId3Tags(), $this->artist->getId3Tags(), $this->getId3Tags());
-
 		$this->write('Updating ID3 tags');
-		print_r($id3Frames);
-
 		try {
-			$idManager = new \Zend_Media_Id3v2($file);
+			$this->idManager = new \Zend_Media_Id3v2($file);
 		}
-		catch(\Zend_Media_Id3_Exception $e)
+		catch(\Zend_Media_Id3_Exception $e) // cannot read existing tags
 		{
-			$idManager = new \Zend_Media_Id3v2();
+			$this->idManager = new \Zend_Media_Id3v2();
 			trigger_error(sprintf("Cannot read Id3 from %s: %s", $file, $e->getMessage()), E_USER_WARNING);
 		}
 		foreach($id3Frames as $frame => $content)
 		{
-			// check if frame exists
-			$currentFrames = $idManager->getFramesByIdentifier(strtoupper($frame));
-			if(sizeof($currentFrames) > 0)
+			$this->addFrame($frame, $content);
+		}
+		$this->idManager->write($file);
+	}
+
+	/**
+	 * Adds an id3 frame using id3Manager
+	 * @param String $frame id3 frame identifier
+	 * @param String $content frame content
+	 *
+	 */
+	private function addFrame($frame, $content)
+	{
+		// check if frame exists
+		$currentFrames = $this->idManager->getFramesByIdentifier(strtoupper($frame));
+		if(sizeof($currentFrames) > 0)
+		{
+			if(strtolower($frame) != 'tenc') // do not update encoder
 			{
-				if(strtolower($frame) != 'tenc') // do not update encoder
-				{
-					$currentFrames[0]->setText($content);
-				}
-			}
-			else
-			{
-				$frameClass = '\\Zend_Media_Id3_Frame_'.$frame;
-				$frameObject = new $frameClass;
-				$frameObject->setText($content);
-				$idManager->addFrame($frameObject);
+				$currentFrames[0]->setText($content);
 			}
 		}
-		$rc = $idManager->write($file);
-		$this->writeln('done, rc=');
-		var_dump($rc);
-		exit;
+		else
+		{
+			$frameClass = '\\Zend_Media_Id3_Frame_'.$frame;
+			$frameObject = new $frameClass;
+			$frameObject->setText($content);
+			$this->idManager->addFrame($frameObject);
+		}
 	}
 
 	public function getId3Tags($version=2)
@@ -207,9 +218,7 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 			$this->artist = $this->album->getArtist();
 			$this->write($this->artist . ' // '. $this->album);
 			$this->processTracks($this->album->getTracks());
-			exit;	// debug - process one album only
 		}
-
 	}
 
 	private function processTracks($tracks)
