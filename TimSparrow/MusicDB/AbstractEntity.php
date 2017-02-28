@@ -12,7 +12,7 @@ use TimSparrow\DB;
 /**
  * Description of AbstractEntity
  *
- * @author timofey
+ * @author TimSparrow
  */
 abstract class AbstractEntity
 {

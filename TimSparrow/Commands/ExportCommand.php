@@ -21,7 +21,7 @@ use TimSparrow\DB;
  *
  * @author TimSparrow
  */
-class ExportCommand extends \ConsoleKit\Command
+class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\Id3Exportable
 {
 	private $albums;
 	private $album;
@@ -184,10 +184,10 @@ class ExportCommand extends \ConsoleKit\Command
 		exit;
 	}
 
-	public function getId3Tags()
+	public function getId3Tags($version=2)
 	{
 		return Array(
-			'Tenc'	=> Config::getSoftware(),
+			'Comm'	=> sprintf("Converted from iTunes using %s", Config::getSoftware()),
 			'Tdtg' => date('Y-m-d H:i:s')
 		);
 	}

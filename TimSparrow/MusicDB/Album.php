@@ -68,7 +68,8 @@ class Album extends AbstractEntity implements Id3Exportable
 	{
 		$tags = Array(
 			'Talb' => $this->album,
-			'Tdrl' => $this->album_year	//valid since Id3V2.4
+			'Tdrl' => $this->album_year,	//valid since Id3V2.4
+			'Tdrc' => $this->album_year
 		);
 		if(isset($this->album_sort))
 		{
