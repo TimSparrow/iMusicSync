@@ -8,7 +8,8 @@ use TimSparrow\Config;
  * and open the template in the editor.
  */
 
-class Album extends AbstractEntity{
+class Album extends AbstractEntity implements Id3Exportable
+{
 
 	const pattern = "%04d_%s";
 	/**

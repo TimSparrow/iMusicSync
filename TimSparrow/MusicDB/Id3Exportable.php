@@ -28,8 +28,9 @@ interface Id3Exportable
 {
 	/**
 	 * Return a subset of Id3 tags relevant to this entity
-	 * @param int $version version of id3 tags to return, assumed 2, ignored
+	 * @param String $version version of id3 tags to return, assumed 2, ignored
+	 * Actually implemented version: 2.4
 	 * @return Array
 	 */
-	public abstract function getId3Tags($version=2);
+	function getId3Tags($version=2);
 }

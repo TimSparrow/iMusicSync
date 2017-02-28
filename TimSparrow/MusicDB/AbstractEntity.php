@@ -14,7 +14,7 @@ use TimSparrow\DB;
  *
  * @author timofey
  */
-abstract class AbstractEntity implements TagsExportable
+abstract class AbstractEntity
 {
 	private $attributes;
 
@@ -24,7 +24,6 @@ abstract class AbstractEntity implements TagsExportable
 		{
 			$this->attributes = Array();
 		}
-
 	}
 
 	/**
@@ -47,6 +46,10 @@ abstract class AbstractEntity implements TagsExportable
 		$this->attributes[$name] = $value;
 	}
 
+	/**
+	 * Returns all stored attributes as array
+	 * @return \Array
+	 */
 	public function getAttributes()
 	{
 		return $this->attributes;
@@ -57,8 +60,6 @@ abstract class AbstractEntity implements TagsExportable
 	 * @return String
 	 */
 	public abstract function getPathName();
-
-
 
 	/**
 	 * returns suitable string representation for listing/logging/debug

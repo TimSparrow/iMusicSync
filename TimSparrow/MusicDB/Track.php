@@ -13,7 +13,7 @@ use TimSparrow\DB;
  *
  * @author TimSparrow
  */
-class Track extends AbstractEntity
+class Track extends AbstractEntity implements Id3Exportable
 {
 	const pattern = "%d_%02d_%s";
 

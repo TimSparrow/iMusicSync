@@ -46,6 +46,10 @@ class DB
 		return Config::getFullPath(Config::get('iPhoneDir')). Config::get('iTunesDB') . '/' . Config::get('dbFile');
 	}
 
+	/**
+	 * Init static db instance and return it
+	 * @return self
+	 */
 	public static function init()
 	{
 		if(null === self::$db)
@@ -59,6 +63,10 @@ class DB
 		return self::$db;
 	}
 
+	/**
+	 * Returns static instance
+	 * @return self
+	 */
 	public static function get()
 	{
 		return self::$db;

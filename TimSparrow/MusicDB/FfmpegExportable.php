@@ -20,13 +20,14 @@
 
 namespace TimSparrow\MusicDB;
 
-/**
- * Returns an array of tag=>value to be used with ffmpeg --metadata command
- * @param \String $format is container file format, defaults to mp3
- * @author TimSparrow
- * @return \Array
- */
+
 interface FfmpegExportable
 {
-	public abstract function getTagsForFfMpeg($format='mp3');
+	/**
+	 * Returns an array of tag=>value to be used with ffmpeg --metadata command
+	 * @param \String $format is container file format, defaults to mp3
+	 * @author TimSparrow
+	 * @return \Array
+	 */
+	abstract function getTagsForFfMpeg($format='mp3');
 }

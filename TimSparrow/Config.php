@@ -22,7 +22,7 @@ namespace TimSparrow;
 use TimSparrow\Exceptions\ConfigException;
 
 /**
- * Description of Config
+ * Container of configuration for iMusicSync utility
  *
  * @author TimSparrow
  */
@@ -52,7 +52,9 @@ class Config
 		'cmdCopy'		=> "cp %1s %2s",		// copy command
 		'cmdLink'		=> "ln %1s %2s",			// link command @deprecated
 		'overwrite'		=> 'newer',					// overwrite files that exist [newer] | all | none
-		'exportDirMode' => 0755	// directory create mode on export
+		'exportDirMode' => 0755,	// directory create mode on export
+
+		'id3format'		=> 2.4		// version of id3 format to implement
 	);
 	private static $instance=null;
 	private $config=null;
@@ -159,7 +161,7 @@ class Config
 				$this->config[$key] = $value;
 			}
 			else {
-				trigger_error(sprintf("CLI: Ignoring invalid option %s", $key));
+				trigger_error(sprintf("CLI: Ignoring invalid option %s", $key), E_USER_NOTICE);
 			}
 		}
 	}
