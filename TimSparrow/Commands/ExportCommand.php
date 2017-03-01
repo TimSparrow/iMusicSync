@@ -198,7 +198,7 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 	public function getId3Tags($version=2)
 	{
 		return Array(
-			'Comm'	=> sprintf("Converted from iTunes using %s", Config::getSoftware()),
+			//'Comm'	=> sprintf("Converted from iTunes using %s", Config::getSoftware()),
 			'Tdtg' => date('Y-m-d H:i:s')
 		);
 	}

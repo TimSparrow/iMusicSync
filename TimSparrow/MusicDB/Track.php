@@ -64,8 +64,10 @@ class Track extends AbstractEntity implements Id3Exportable
 			. " item_extra.track_count AS track_count,"
 			. " item_extra.total_time_ms AS track_time,"
 			. " item_extra.file_size AS file_size,"
+			. " item_exita.comment AS comment,"
 			. "	base_location.path AS path,"
-			. "	item_playback.bit_rate AS bitrate "
+			. "	item_playback.bit_rate AS bitrate,"
+			. " item.playback.duration AS duration "
 			. "FROM item JOIN item_extra ON item.item_pid = item_extra.item_pid "
 			. "	JOIN genre ON item.genre_id=genre.genre_id "
 			. "	JOIN item_playback ON item.item_pid= item_playback.item_pid"
@@ -94,7 +96,8 @@ class Track extends AbstractEntity implements Id3Exportable
 			'Tlen'	=> $this->getId3Len(),
 			'Trck'	=> $this->track_number,
 			'Tpos'	=> $this->disc_number,
-			'Tcon'	=> $this->genre
+			'Tcon'	=> $this->genre,
+			'Comm'	=> $this->comment
 		);
 	}
 
