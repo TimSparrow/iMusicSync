@@ -10,7 +10,8 @@ namespace TimSparrow\MusicDB;
 use TimSparrow\DB;
 
 /**
- * Description of AbstractEntity
+ * Abstract layer to represent a music database entity
+ * Any entity such as album, track, etc should inherit this class
  *
  * @author TimSparrow
  */
@@ -54,12 +55,7 @@ abstract class AbstractEntity
 	{
 		return $this->attributes;
 	}
-	/**
-	 * Returns a string representation of the entity suitable for file name component
-	 * Should be reasonably sortable (i.e. albums start with year, tracks with number
-	 * @return String
-	 */
-	public abstract function getPathName();
+
 
 	/**
 	 * returns suitable string representation for listing/logging/debug

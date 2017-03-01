@@ -13,7 +13,7 @@ use TimSparrow\DB;
  *
  * @author TimSparrow
  */
-class Track extends AbstractEntity implements Id3Exportable
+class Track extends AbstractEntity implements Id3Exportable, MusicLibExportable
 {
 	const pattern = "%d_%02d_%s";
 
@@ -134,4 +134,17 @@ class Track extends AbstractEntity implements Id3Exportable
 		return $this->_time->format($format);
 	}
 
+
+	public function getArtwork()
+	{
+		try {
+			return Artwork::getForTrack($this->getId());
+		}
+		catch (Exception $x)
+		{
+			// @todo Attempt to retrieve artwork elsewhere
+			trigger_error(sprintf("Cannot get artwork for %s: %s", $this, $x->getMessage()), E_USER_WARNING);
+			return null;
+		}
+	}
 }

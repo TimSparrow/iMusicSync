@@ -14,7 +14,7 @@ use TimSparrow\DB;
  *
  * @author timofey
  */
-class Artist extends AbstractEntity implements Id3Exportable
+class Artist extends AbstractEntity implements Id3Exportable, MusicLibExportable
 {
 	public function getPathName()
 	{

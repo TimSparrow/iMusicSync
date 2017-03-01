@@ -32,7 +32,7 @@ class Config
 	 * Config file name
 	 */
 	const configFile = './iMusicSync.ini';
-	const version = '0.1.0';
+	const version = '0.1.1';
 	/**
 	 * default values
 	 * overriden by config.ini values
@@ -44,6 +44,7 @@ class Config
 		'iTunesDB'		=> 'iTunes_Control',
 		'dbFile'		=> 'iTunes/MediaLibrary.sqlitedb',
 		'musicLibPath'	=> '/Music',
+		'artworkPath'	=> '/Artwork/',
 		'exportTargetPath'	=> '~/Music',
 
 		'useLinks'		=> false,	// use hard links (debug only, ignored if useRecode=true), deprecated

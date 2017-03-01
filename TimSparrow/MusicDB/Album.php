@@ -8,7 +8,7 @@ use TimSparrow\Config;
  * and open the template in the editor.
  */
 
-class Album extends AbstractEntity implements Id3Exportable
+class Album extends AbstractEntity implements Id3Exportable, MusicLibExportable
 {
 
 	const pattern = "%04d_%s";
