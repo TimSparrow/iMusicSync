@@ -166,6 +166,10 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 		{
 			$this->addFrame($frame, $content);
 		}
+		if($this->album->hasArtwork())
+		{
+			$this->addArtwork($this->album->getArtwork());
+		}
 		$this->idManager->write($file);
 	}
 
@@ -192,6 +196,16 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 			$frameObject = new $frameClass;
 			$frameObject->setText($content);
 			$this->idManager->addFrame($frameObject);
+		}
+	}
+
+	private function addArtwork($artwork)
+	{
+		$frame_id = 'Apic';
+		$currentFrames = $this->idManager->getFramesByIdentifier($frame_id);
+		if(sizeof($currentFrames) > 0)
+		{
+			// update image of the current frame
 		}
 	}
 
@@ -227,6 +241,10 @@ class ExportCommand extends \ConsoleKit\Command implements \TimSparrow\MusicDB\I
 		$this->writeln(sprintf("::Tracks:%d", sizeof($tracks)));
 		foreach($tracks as $this->track)
 		{
+			if(!$this->album->hasArtwork())
+			{
+				$this->album->setArtwork($this->track->getArtwork());
+			}
 			$this->write("\t".$this->track." --> ");
 			$this->saveTrack($this->track, $path);
 		}

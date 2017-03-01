@@ -26,9 +26,33 @@ use TimSparrow\Config;
  *
  * @author timofey
  */
-class Artwork extends AbstractEntity
+class Artwork extends AbstractEntity 
 {
+
+	const OTHER				= 0x00;
+	const ICON_32			= 0x01;
+	const ICON_OTHER			= 0x02;
+	const COVER_FRONT		= 0x03;
+	const COVER_BACK		= 0x04;
+	const LEAFLET_PAGE		= 0x05;
+	const MEDIA				= 0x06;
+	const LEAD_ARTIST		= 0x07;
+	const ARTIST			= 0x08;
+	const CONDUCTOR			= 0x09;
+	const ORCHESTRA			= 0x0A;
+	const COMPOSER			= 0x0B;
+	const LYRICIST			= 0x0C;
+	const RECORDING_LOCATION= 0x0D;
+	const DURING_RECORDING	= 0x0E;
+	const DURING_PERFORMANCE= 0x0F;
+	const SCREEN_CAPTURE		= 0x10;
+	const FISH				= 0x11;
+	const ILLUSTRATION		= 0x12;
+	const LOGO_ARTIST		= 0x13;
+	const LOGO_PUBLISHER	= 0x14;
+
 	private static $artworkPath = null;
+	private $picType=false;
 	public function __construct()
 	{
 		if(null==self::$artworkPath)
@@ -37,7 +61,13 @@ class Artwork extends AbstractEntity
 		}
 	}
 
-	public static function getForTrack($item_pid)
+	/**
+	 * Returns an artwork stored in database for a given entity
+	 * @param String $item_pid - iTunes item id
+	 * @return Artwork
+	 * @throws Exception if not found
+	 */
+	public static function getForEntity($item_pid)
 	{
 		$query = "SELECT "
 				. " artwork.artwork_token AS token, "
@@ -46,7 +76,7 @@ class Artwork extends AbstractEntity
 				. " artwork.artwork_source_type AS source_type,"
 				. " artwork_token"
 				. "FROM artwork_token JOIN artwork ON artwork.token = artwork_token.artwork_token "
-				. "WHERE artwork_type=1 AND artwork_token.entity_id = ?";
+				. "WHERE artwork_token.entity_id = ?";
 		$stm = DB::get()->prepare($query);
 		$stm->setFetchMode(\PDO::FETCH_CLASS, get_class());
 		if($stm->execute(Array($item_pid)))
@@ -58,6 +88,10 @@ class Artwork extends AbstractEntity
 		}
 	}
 
+	/**
+	 * Returns id of the current object
+	 * @return type
+	 */
 	public function getId()
 	{
 		return $this->token;
@@ -68,11 +102,21 @@ class Artwork extends AbstractEntity
 		return sprintf('Artwork[%s]', $this->getId());
 	}
 
+	/**
+	 * Returns path to the file containing original artwork image
+	 * @return String
+	 */
 	public function getOriginal()
 	{
 		return self::$artworkPath . 'Originals/' . $this->path;
 	}
 
+	/**
+	 * Returns a scaled version of the image if available
+	 * @param int $size of the scaled down image
+	 * @return string path to the file
+	 * @throws Exception if does not exist
+	 */
 	public function getScaled($size)
 	{
 		$path = self::$artworkPath . 'Cached/' .$size . 'x' . $size . '/'. $this->path;
@@ -83,5 +127,23 @@ class Artwork extends AbstractEntity
 		else {
 			throw new Exception(sprintf("Cannot find artwork for size %s", $size));
 		}
+	}
+
+	/**
+	 * Returns image data for the original image file
+	 * @return String - binary image data
+	 */
+	public function getData()
+	{
+		return file_get_contents($this->getOriginal());
+	}
+
+	/**
+	 * Detects and returns the mime type of the image
+	 * @return string
+	 */
+	public function getMimeType()
+	{
+		return 'image/';
 	}
 }
