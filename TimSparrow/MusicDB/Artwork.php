@@ -49,7 +49,7 @@ class Artwork extends AbstractEntity
 	const FISH				= 0x11;
 	const ILLUSTRATION		= 0x12;
 	const LOGO_ARTIST		= 0x13;
-	const LOGO_PUBLISHER	= 0x14;
+	const LOGO_PUBLISHER		= 0x14;
 
 	private static $artworkPath = null;
 	private $picType=false;

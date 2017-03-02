@@ -18,6 +18,7 @@ use TimSparrow\DB;
 abstract class AbstractEntity
 {
 	private $attributes;
+	protected $artwork;
 
 	public function __construct()
 	{
@@ -81,5 +82,26 @@ abstract class AbstractEntity
 		$s = preg_replace('/\-+/', '-', $s);
 		$s = trim($s, '-');
 		return $s;
+	}
+
+	/**
+	 * retrieves artwork for current entity
+	 * @return Artwork
+	 */
+	public function getArtwork()
+	{
+		if(null==$this->artwork)
+		{
+			try {
+				$this->artwork = Artwork::getForEntity($this->getId());
+			}
+			catch (Exception $x)
+			{
+				// @todo Attempt to retrieve artwork elsewhere
+				trigger_error(sprintf("Cannot get artwork for %s: %s", $this, $x->getMessage()), E_USER_WARNING);
+				return null;
+			}
+		}
+		return $this->artwork;
 	}
 }
