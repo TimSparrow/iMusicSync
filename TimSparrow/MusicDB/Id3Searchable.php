@@ -1,8 +1,7 @@
-#!/usr/bin/php
 <?php
 
 /*
- * Copyright (C) 2017 TimSparrow
+ * Copyright (C) 2017 timofey
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,28 +18,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-// autoload composer dependencies
-require_once 'vendor/autoload.php';
-use TimSparrow\Commands\ExportCommand;
-use TimSparrow\Commands\ImportCommand;
+namespace TimSparrow\MusicDB;
 
-// autoload our classes
-spl_autoload_register(function($name){
-	$name = str_replace('\\', '/', $name);
-	require_once './'.$name.'.php';
-});
-
-
-
-
-$console = new ConsoleKit\Console();
-$console->setVerboseException();
-try {
-	$console->addCommand('ExportCommand');
-	$console->addCommand('ImportCommand');
-	$console->run();
-}
-catch (\Exception $x)
+/**
+ *
+ * @author timofey
+ */
+interface Id3Searchable
 {
-	$this->writeException($x);
+	/**
+	 * initialize entity by tag
+	 * Find a matching record and return object, or false if not found
+	 * @param $tag
+	 */
+	function searchTag(\String $tag);
 }

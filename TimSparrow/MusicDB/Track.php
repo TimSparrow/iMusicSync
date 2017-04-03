@@ -13,13 +13,15 @@ use TimSparrow\DB;
  *
  * @author TimSparrow
  */
-class Track extends AbstractEntity implements Id3Exportable, MusicLibExportable
+class Track extends AbstractEntity implements Id3Exportable, MusicLibExportable, Taggable
 {
 	const pattern = "%d_%02d_%s";
 
 	private $_album=null;
 	private $_artist=null;
 	private $_time=null;
+
+	private $tags=null;
 	
 	public function getPathName()
 	{
@@ -132,5 +134,19 @@ class Track extends AbstractEntity implements Id3Exportable, MusicLibExportable
 			$this->_time = \DateTime::createFromFormat('U.u', $this->track_time / 1000);
 		}
 		return $this->_time->format($format);
+	}
+
+	function getTagContent($tag)
+	{
+		if($this->tags)
+		{
+			return $this->tags->$tag;
+		}
+		else {
+			switch($tag)
+			{
+				default: throw new InvalidTagException(sprintf("Tag %s is not implemented in %s", $tag, get_class()));
+			}
+		}
 	}
 }

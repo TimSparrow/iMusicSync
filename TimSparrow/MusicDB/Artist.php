@@ -14,8 +14,16 @@ use TimSparrow\DB;
  *
  * @author timofey
  */
-class Artist extends AbstractEntity implements Id3Exportable, MusicLibExportable
+class Artist
+	extends AbstractEntity
+	implements
+		Id3Exportable,
+		MusicLibExportable,
+		Id3Searchable
 {
+	// set of Id3 tags identifying this entity. used by
+	const TAGS=['TPE2'];
+
 	public function getPathName()
 	{
 		return $this->normalize($this->album_artist);
@@ -52,5 +60,16 @@ class Artist extends AbstractEntity implements Id3Exportable, MusicLibExportable
 			'Tpe1' => $this->album_artist,
 			'Tso2' => $this->sort_album_artist
 		);
+	}
+
+	public static function searchTag(Taggable $taglib)
+	{
+		$query = "SELECT * FROM album_artist WHERE album_artist LIKE ?";
+		$stm = DB::get()->prepare($query);
+		$stm->setFetchMode(\PDO::FETCH_CLASS, get_class());
+		if($stm->execute($taglib->getTagContent(self::TAGS)))
+		{
+			return $stm->fetch();
+		}
 	}
 }
